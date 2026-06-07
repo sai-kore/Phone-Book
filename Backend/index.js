@@ -3,18 +3,18 @@ const app = express();
 const cors = require('cors')
 
 app.use(cors())
-
+app.use(express.static('dist'))
 
 let persons = [
   {
     name: "Hello",
     number: "1234",
-    id: "c-87uwEhzgw",
+    id: "1",
   },
   {
     name: "Oggy",
     number: "986",
-    id: "CqLU_ek8d_A",
+    id: "2",
   },
 ];
 
@@ -47,11 +47,13 @@ app.get("/persons/:id", (req, res) => {
   }
 });
 
-const generateId = () => {
-  const maxID =
-    persons.length > 0 ? Math.max(...persons.map((n) => Number(n.id))) : 0;
-  return String(maxID + 1);
-};
+// const generateId = () => {
+//   const maxID =
+//     persons.length > 0 ? Math.max(...persons.map((n) => Number(n.id))) : 0;
+//   return String(maxID + 1);
+// };
+
+const generateId = () => String(Date.now());
 
 app.post("/persons", (req, res) => {
   const body = req.body;
@@ -61,17 +63,46 @@ app.post("/persons", (req, res) => {
       error: "name is missing",
     });
   }
+  
   if (!body.number) {
     return res.status(400).json({
       error: "number is missing",
     });
   }
+  
+  const existingPerson = persons.find(
+    person => person.name === body.name
+  );
+  
+  if (existingPerson) {
+    return res.status(400).json({
+      error: "name must be unique",
+    });
+  }
+
   const person = {
     name: body.name,
     number: body.number,
     id: generateId(),
   };
   persons = persons.concat(person);
+
+  res.json(person);
+});
+
+app.put("/persons/:id", (req, res) => {
+  const id = req.params.id;
+  const body = req.body;
+
+  const person = {
+    name: body.name,
+    number: body.number,
+    id,
+  };
+
+  persons = persons.map((p) =>
+    p.id === id ? person : p
+  );
 
   res.json(person);
 });
