@@ -28,9 +28,9 @@ const requestLogger = (req, res, next) => {
 
 app.use(requestLogger);
 
-app.get("/", (req, res) => {
-  res.send("<h1>Hello there how's your day going!</h1>");
-});
+// app.get("/", (req, res) => {
+//   res.send("<h1>Hello there how's your day going!</h1>");
+// });
 
 app.get("/persons", (req, res) => {
   res.json(persons);
